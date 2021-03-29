@@ -6,11 +6,14 @@ class ListAllUsersController {
   constructor(private listAllUsersUseCase: ListAllUsersUseCase) {}
 
   handle(request: Request, response: Response): Response {
-    const { user_id } = request.body;
+    try {
+      const { user_id } = request.headers as { user_id: string };
+      const user = this.listAllUsersUseCase.execute({ user_id });
 
-    const user = this.listAllUsersUseCase.execute(user_id);
-
-    return response.json(user);
+      return response.status(200).json(user);
+    } catch (err) {
+      return response.status(400).json({ error: err.message });
+    }
   }
 }
 
